@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+model ExamAttempt {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  examCode          String
+  role              String
+  status            String   // IN_PROGRESS | FINISHED
+
+  focusLost         Int      @default(0)
+  suspiciousCount   Int      @default(0)
+  lastHeartbeatAt   DateTime?
+
+  events            ExamEventLog[]
+
+  createdAt         DateTime @default(now())
+}
+
+model ExamEventLog {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  attemptId String   @db.ObjectId
+  attempt   ExamAttempt @relation(fields: [attemptId], references: [id])
+
+  type       String
+  detail     String?
+  createdAt DateTime @default(now())
+}
